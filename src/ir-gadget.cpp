@@ -1,5 +1,4 @@
-#include <stdbool.h>
-#include <stdint.h>
+#include <cstdint>
 
 #include "inc/hw_types.h"
 #include "inc/hw_memmap.h"
@@ -11,6 +10,7 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
 #include "driverlib/uart.h"
+#include "driverlib/interrupt.h"
 
 #include "utils/uartstdio.h"
 
@@ -106,9 +106,9 @@ int main(void) {
     TimerEnable(TIMER0_BASE, TIMER_B);
 
 	unsigned long m = 0;
-    while(1) {
-    TimerMatchSet(TIMER0_BASE, TIMER_B, m++); // PWM
-	if (m > ir_period) m = 0;
-        SysCtlDelay(5000);
-    }
+	while(1) {
+		TimerMatchSet(TIMER0_BASE, TIMER_B, m++); // PWM
+		if (m > ir_period) m = 0;
+		SysCtlDelay(5000);
+	}
 }
