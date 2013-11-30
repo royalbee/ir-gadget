@@ -3,6 +3,7 @@
 #include "inc/hw_types.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_gpio.h"
+#include "inc/hw_nvic.h"
 
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
@@ -11,8 +12,11 @@
 #include "driverlib/rom.h"
 #include "driverlib/uart.h"
 #include "driverlib/interrupt.h"
+#include <driverlib/pin_map.h>
 
 #include "utils/uartstdio.h"
+
+#include "ring.h"
 
 #define IR_CARRIER 38400
 
@@ -48,19 +52,19 @@ ConfigureUART(void)
 }
 
 #define SW1 4
-int on = 0;
 
 #define IR_PORT GPIO_PORTA_BASE
 #define IR_PIN GPIO_PIN_2
 
+emb::ring<uint32_t, 8> ir;
+
 void ir_input_isr(void)
 {
 	GPIOIntClear(IR_PORT, IR_PIN);
-	on ^= 1;
-	UARTprintf("on:%d\n", on);
+	ir.push_back(HWREG(NVIC_ST_CURRENT));
 }
 
-int main(void) {
+extern "C" int main(void) {
     unsigned long ir_period;
 
     // 40 MHz system clock
@@ -109,6 +113,9 @@ int main(void) {
 	while(1) {
 		TimerMatchSet(TIMER0_BASE, TIMER_B, m++); // PWM
 		if (m > ir_period) m = 0;
-		SysCtlDelay(5000);
+		int i = 0;
+		while (i++ < 5000)
+			if (!ir.empty())
+				UARTprintf("%u", ir.pop_front());
 	}
 }
