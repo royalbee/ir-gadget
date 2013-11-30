@@ -1,5 +1,7 @@
 *.d
 *.o
+*.o.bc
+*.o.s
 *.bin
 *.swp
 a.out
