@@ -34,5 +34,26 @@ int main()
 	for (int i = 0 ; i < c->size(); i++)
 		assert(i*i == (*c)[i]);
 
+	//iterator access
+	{
+		int i = 0;
+		for (auto p = r.begin(), end = r.end(); p != end; p++)
+		{
+			assert(i*i == *p);
+			i++;
+		}
+		cout << "iterator count:" << i << endl;
+	}
+
+	//range loop
+	{
+		int i = 0;
+		for (auto v : r)
+		{
+			assert(i*i == v);
+			i++;
+		}
+		cout << "range count:" << i << endl;
+	}
 	assert(!c->empty());
 }
